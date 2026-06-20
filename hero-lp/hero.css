@@ -1,0 +1,179 @@
+/* =========================================================
+   親子の水彩イラスト ヒーローセクション
+   - HTML + CSS のみ（JSなし）
+   - @keyframes による揺れ＋トントン
+   - prefers-reduced-motion 対応
+   ========================================================= */
+
+:root {
+  /* 揺れのチューニング用変数 */
+  --sway-duration: 3.5s;   /* 3〜4秒で1往復 */
+  --sway-angle: 1.5deg;    /* ごく僅かな傾き */
+  --pat-duration: 1s;      /* 1秒に1回のトントン */
+  --pat-distance: 4px;     /* 上下に動く量 */
+
+  --hero-bg-top: #fdf6ef;
+  --hero-bg-bottom: #f6e7da;
+  --text-main: #4a3f37;
+  --text-sub: #8a7c70;
+  --accent: #d98a6a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- レイアウト ---------- */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: 100vh;
+  padding: clamp(2rem, 5vw, 5rem);
+  background: linear-gradient(160deg, var(--hero-bg-top), var(--hero-bg-bottom));
+  overflow: hidden;
+}
+
+/* ---------- イラストのステージ ---------- */
+.hero__stage {
+  position: relative;
+  width: 100%;
+  /* イラストの縦横比に応じて確保する高さ。画像差し替え時はここを調整 */
+  aspect-ratio: 4 / 5;
+  max-width: 520px;
+  margin-inline: auto;
+}
+
+/* 揺れの土台：bottom center（腰あたり）を軸にゆっくり左右に傾く */
+.hero__sway {
+  position: absolute;
+  inset: 0;
+  transform-origin: bottom center;
+  animation: sway var(--sway-duration) ease-in-out infinite;
+  will-change: transform;
+}
+
+/* 重ねるレイヤーはすべて absolute で同じ枠に配置 */
+.hero__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 母（土台）→ 赤ちゃん → 手 の順で重ねる */
+.hero__mother { z-index: 1; }
+.hero__baby   { z-index: 2; }
+.hero__hand   { z-index: 3; }
+
+/* トントンする手：揺れの土台の中で、さらに上下する別アニメーション */
+.hero__hand {
+  transform-origin: center;
+  animation: pat var(--pat-duration) ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ---------- コピー ---------- */
+.hero__copy {
+  max-width: 30rem;
+}
+
+.hero__eyebrow {
+  margin: 0 0 0.75rem;
+  letter-spacing: 0.2em;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.hero__title {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.hero__lead {
+  margin: 0 0 2rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  line-height: 1.9;
+  color: var(--text-sub);
+}
+
+.hero__cta {
+  display: inline-block;
+  padding: 0.9rem 2.2rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(217, 138, 106, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero__cta:hover,
+.hero__cta:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(217, 138, 106, 0.45);
+}
+
+/* ---------- アニメーション ---------- */
+
+/* 全体のゆっくりした揺れ（-1.5deg 〜 +1.5deg） */
+@keyframes sway {
+  0%   { transform: rotate(calc(var(--sway-angle) * -1)); }
+  50%  { transform: rotate(var(--sway-angle)); }
+  100% { transform: rotate(calc(var(--sway-angle) * -1)); }
+}
+
+/* 手のトントン（0 → -4px → 0） */
+@keyframes pat {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(calc(var(--pat-distance) * -1)); }
+  100% { transform: translateY(0); }
+}
+
+/* ---------- レスポンシブ ---------- */
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    min-height: auto;
+    padding-block: clamp(3rem, 10vw, 5rem);
+  }
+
+  .hero__stage {
+    order: -1;          /* イラストを上に */
+    max-width: 360px;
+  }
+
+  .hero__copy {
+    margin-inline: auto;
+  }
+}
+
+/* ---------- 動きを抑える版（prefers-reduced-motion） ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero__sway,
+  .hero__hand {
+    animation: none;
+    transform: none;
+  }
+
+  .hero__cta {
+    transition: none;
+  }
+}
