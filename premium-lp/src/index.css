@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ivory text-ink font-sans antialiased;
+    /* Prevent horizontal overflow caused by pinned/parallax sections. */
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: theme('colors.violet');
+    color: white;
+  }
+}
+
+@layer components {
+  /* Soft section frame used across the page. */
+  .section-shell {
+    @apply mx-auto w-full max-w-content px-6 md:px-10;
+  }
+
+  /* Eyebrow label above headings. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-ink/50;
+  }
+
+  /* Premium gradient text used sparingly for accent words. */
+  .text-gradient {
+    @apply bg-gradient-to-r from-ocean via-violet to-cyan bg-clip-text text-transparent;
+  }
+
+  /* Glass card surface — restrained, not flashy. */
+  .glass {
+    @apply rounded-2xl border border-white/60 bg-white/70 shadow-[0_8px_40px_-12px_rgba(10,12,16,0.12)] backdrop-blur-xl;
+  }
+}
+
+@layer utilities {
+  /* Subtle dotted grid background used in hero / CTA. */
+  .bg-grid {
+    background-image: radial-gradient(rgba(10, 12, 16, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .bg-grid-dark {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* Horizontal scroll-snap container for the showcase / feature rails. */
+  .snap-x-rail {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .snap-x-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .snap-item {
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+}
+
+/* Respect users who prefer reduced motion: kill all non-essential motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
