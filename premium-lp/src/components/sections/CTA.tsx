@@ -49,8 +49,9 @@ export function CTA() {
 
       <div className="section-shell relative z-10 text-center">
         <div data-cta-el className="mx-auto mb-6 h-16 w-16">
-          {/* Placeholder Lottie — swap /public/lottie/processing.json freely. */}
-          <LottiePlayer src="/lottie/processing.json" ariaLabel="システム稼働中" />
+          {/* Placeholder Lottie — swap /public/lottie/processing.json freely.
+              BASE_URL keeps the path correct under GitHub Pages subpaths. */}
+          <LottiePlayer src={`${import.meta.env.BASE_URL}lottie/processing.json`} ariaLabel="システム稼働中" />
         </div>
 
         <span data-cta-el className="eyebrow !text-ivory/50">

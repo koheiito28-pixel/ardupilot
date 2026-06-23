@@ -1,0 +1,71 @@
+# Builds the premium-lp landing page and publishes it to GitHub Pages so it
+# can be opened from any device (incl. a phone). Project-page URL:
+#   https://<owner>.github.io/<repo>/
+name: Deploy premium-lp to GitHub Pages
+
+on:
+  # Run when the LP changes on its feature branch.
+  push:
+    branches: ['claude/premium-lp-animations-q0neqi']
+    paths: ['premium-lp/**', '.github/workflows/deploy-premium-lp.yml']
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+# Permissions required by the Pages deploy actions.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment.
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: premium-lp
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: premium-lp/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Build with a base path matching the project-page subpath
+      # (/<repo>/) so all asset URLs resolve correctly on Pages.
+      - name: Build
+        run: npm run build -- --base="/${GITHUB_REPOSITORY#*/}/"
+
+      - name: Setup Pages
+        # enablement: true turns on GitHub Pages automatically if it is
+        # not already enabled for the repository.
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: premium-lp/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
